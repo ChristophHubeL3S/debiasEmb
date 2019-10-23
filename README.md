@@ -15,8 +15,10 @@ be used for training. You can specify further parameters like the path to the na
 
 Example call:
 
+```
 python train.py -i <path_to_your_text_file_for_training> -o <path_to_your_output_directory> -m debias -n 
 <path_to_your_list_of_words_to_be_debiased> -b 64
+```
 
 The output directory will contain the trained model after the last epoch and the embeddings in standard w2v format.
 
