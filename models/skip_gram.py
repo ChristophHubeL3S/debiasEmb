@@ -1,22 +1,25 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
-"""The skip-gram model itself"""
 
 
 class SkipGram(nn.Module):
-    def __init__(self, vocab_size, emb_dimension):
+    def __init__(self, vocab_size, emb_dimension, is_cuda=True):
         super(SkipGram, self).__init__()
 
         # set the parameters for the embedding model
         self.vocab_size = vocab_size
         self.emb_dimension = emb_dimension
+        self.is_cuda = is_cuda
 
         # the embeddings for the center and context words
         self.center_embeddings = nn.Embedding(vocab_size, emb_dimension, sparse=True)
         self.context_embeddings = nn.Embedding(vocab_size, emb_dimension, sparse=True)
 
-        self.log_sigmoid = nn.LogSigmoid()
+        if self.is_cuda:
+            self.center_embeddings = self.center_embeddings.cuda()
+            self.context_embeddings = self.context_embeddings.cuda()
 
         initrange = 0.5 / self.emb_dimension
 
@@ -36,17 +39,18 @@ class SkipGram(nn.Module):
         u = self.context_embeddings(context_output)
 
         # check the similarity between the center and context words
-        pos_val = self.log_sigmoid(torch.sum(u * v, dim=1)).squeeze()
+        score = torch.mul(v, u)
+        score = torch.sum(score, dim=1)
+        pos_val = F.logsigmoid(score).squeeze()
 
         # u_hat: [batch_size, neg_size, emb_dim]
         u_negative = self.context_embeddings(negative_samples)
         # [batch_size, neg_size, emb_dim] x [batch_size, emb_dim, 1] = [batch_size, neg_size, 1]
 
-        # neg_vals: [batch_size, neg_size]
-        neg_vals = torch.bmm(u_negative, v.unsqueeze(2)).squeeze(2) # bmm = matrix product
-
         # neg_val: [batch_size]
-        neg_val = self.log_sigmoid(-torch.sum(neg_vals, dim=1)).squeeze()
+        neg_score = torch.bmm(u_negative, v.unsqueeze(2)).squeeze()
+        neg_val = torch.sum(neg_score, dim=1)
+        neg_val = F.logsigmoid(-1 * neg_val).squeeze()
 
         loss = pos_val + neg_val
         return -loss.mean()
