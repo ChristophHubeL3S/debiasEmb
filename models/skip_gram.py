@@ -43,7 +43,7 @@ class SkipGram(nn.Module):
         # [batch_size, neg_size, emb_dim] x [batch_size, emb_dim, 1] = [batch_size, neg_size, 1]
 
         # neg_vals: [batch_size, neg_size]
-        neg_vals = torch.bmm(u_negative, v.unsqueeze(2)).squeeze(2)
+        neg_vals = torch.bmm(u_negative, v.unsqueeze(2)).squeeze(2) # bmm = matrix product
 
         # neg_val: [batch_size]
         neg_val = self.log_sigmoid(-torch.sum(neg_vals, dim=1)).squeeze()

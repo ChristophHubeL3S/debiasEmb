@@ -38,7 +38,7 @@ if __name__ == '__main__':
     if p.model == 'w2v':
         model = Word2Vec(data_path=p.input, vocab_size=p.vocab_size, emb_size=p.emb_dim, output_dir=p.out_dir, cuda=p.cuda)
     else:
-        lr_weights = pickle.load(open(p.weights, 'rb'))
+        lr_weights = pickle.load(open(p.weights, 'rb'))  # weights required when using debias!!!
         names_dict = set(open(p.names, 'rt').readlines())
         model = DebiasWord2Vec(data_path=p.input, vocab_size=p.vocab_size, emb_size=p.emb_dim, output_dir=p.out_dir,
                                sent_lr_weights=lr_weights, names_dict=names_dict, cuda=p.cuda)
