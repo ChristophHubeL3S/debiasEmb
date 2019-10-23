@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
 
+"""The skip-gram model itself"""
+
 
 class SkipGram(nn.Module):
     def __init__(self, vocab_size, emb_dimension):

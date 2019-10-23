@@ -17,7 +17,7 @@ def get_arguments():
     parser.add_argument('-o', '--out_dir', help='The output directory where we store the results', required=True)
     parser.add_argument('-n', '--names', help='The list of names for which we want to debias the embeddings',
                         required=False)
-    parser.add_argument('-m', '--model', help='The type of embedding we want to train.', required=True, default='w2v')
+    parser.add_argument('-m', '--model', help='The type of embedding we want to train.', required=False, default='w2v')
     parser.add_argument('-v', '--vocab_size', help='The size of the vocabulary.', required=False, default=10000,
                         type=int)
     parser.add_argument('-e', '--epochs', help='Training epochs.', required=False, default=10000, type=int)
@@ -36,7 +36,7 @@ if __name__ == '__main__':
     p = get_arguments()
 
     if p.model == 'w2v':
-        model = Word2Vec(data_path=p.input, vocab_size=p.vocab_size, emb_size=p.emb_dim, output_dir=p.out_dir)
+        model = Word2Vec(data_path=p.input, vocab_size=p.vocab_size, emb_size=p.emb_dim, output_dir=p.out_dir, cuda=p.cuda)
     else:
         lr_weights = pickle.load(open(p.weights, 'rb'))
         names_dict = set(open(p.names, 'rt').readlines())

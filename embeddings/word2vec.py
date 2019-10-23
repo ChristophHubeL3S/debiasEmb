@@ -6,6 +6,8 @@ from models.skip_gram import SkipGram
 from utils.utils import DataPipeline, read_data, construct_skipgram_training_instances
 from utils.vector_handle import *
 
+"""Code for training and working with a skip-gram model"""
+
 
 class Word2Vec:
     def __init__(self, data_path, vocab_size, emb_size, learning_rate=0.1, output_dir='', cuda=False):
