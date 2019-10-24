@@ -10,7 +10,7 @@ from utils.vector_handle import *
 
 class DebiasWord2Vec:
     def __init__(self, data_path, vocab_size, emb_size, sent_lr_weights, names_dict, learning_rate=0.1, output_dir='',
-                 check_names=False, intercept=1.01, is_cuda=True, emb_model_states=''):
+                 check_names=False, intercept=1.01, is_cuda=False, emb_model_states=''):
         self.data, self.word_list = read_data(data_path)
 
         self.data, self.word_count, self.word2index, self.index2word = construct_skipgram_training_instances(self.data,
@@ -18,7 +18,7 @@ class DebiasWord2Vec:
                                                                                                              vocab_size)
         # get the indexes of the names in our dictionary
         self.names_dict_idx = set([self.word2index[word] for word in names_dict if word in self.word2index])
-        print ('Dictionary overlap length %d' % len(self.names_dict_idx))
+        print('Dictionary overlap length %d' % len(self.names_dict_idx))
 
         self.is_cuda = is_cuda == 'True'
         self.model = DebiasedSkipGram(vocab_size=len(self.word_count), sent_word_model_weights=sent_lr_weights,
@@ -44,13 +44,13 @@ class DebiasWord2Vec:
         # check how many iterations we will need for the entire data per epoch
         no_iter_per_epoch = int(float(len(pipeline.data)) / batch_step)
 
-        print ('Extracted the training data, now starting to train for %d batches of size %d' % (
+        print('Extracted the training data, now starting to train for %d batches of size %d' % (
             no_iter_per_epoch, batch_size))
         for step in range(train_steps):
             pipeline.sentence_pointer = 0
             start_time = time.time()
 
-            print ('Started training for epoch %d' % step)
+            print('Started training for epoch %d' % step)
 
             # iterate over all the batches in the data
             avg_loss = 0
@@ -90,12 +90,11 @@ class DebiasWord2Vec:
                     avg_loss_tmp += loss.item()
                     counter += 1
 
-                print ('Finished processing counter %d with loss of %.3f' % (counter, (avg_loss_tmp/float(len(batch_inputs)))))
+                print('Finished processing counter %d with loss of %.3f' % (counter, (avg_loss_tmp/float(len(batch_inputs)))))
 
             avg_loss /= counter
             end_time = time.time() - start_time
-            print (
-                'Finished processing training for epoch %d in %s with a loss of %.3f' % (step, str(end_time), avg_loss))
+            print('Finished processing training for epoch %d in %s with a loss of %.3f' % (step, str(end_time), avg_loss))
 
             self.save_vector_txt(path_file=self.output_dir + '/' + emb_file + '_' + model + '_' + str(step) + '.emb')
             self.save_model(out_path=self.output_dir + '/' + emb_file + '_' + model + '_' + str(step) + '.model')

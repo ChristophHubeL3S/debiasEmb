@@ -3,7 +3,7 @@ import pickle
 import argparse
 
 '''
-    Set up the arguments and parse them.
+    Evaluate word embeddings.
 '''
 
 
@@ -12,7 +12,7 @@ def get_arguments():
         description='Use this script to evaluate the sentiment bias of word embeddings.')
     parser.add_argument('-e', '--emb', help='The input path to the word embedding.', required=True)
     parser.add_argument('-o', '--out_dir', help='The output directory where we store the results', required=True)
-    parser.add_argument('-n', '--names', help='The list of names for which we want to debias the embeddings', required=False)
+    parser.add_argument('-ev', '--eval', help='The list of eval words (e.g. names) for which we want to debias the embeddings', required=False)
     parser.add_argument('-m', '--model', help='The path to the pre-trained Logistic Regression model.', required=True)
     parser.add_argument('-t', '--emb_type', help='The type of the word embedding.', required=True, default='Debiased')
 
@@ -25,18 +25,21 @@ def vec(w, emb):
     except Exception as e:
         return None
 
+
 if __name__ == '__main__':
     p = get_arguments()
 
     emb = pd.read_table(p.emb, sep=' ', header=None, skiprows=0, index_col=0)
+
+    # load classifier
     clf = pickle.load(open(p.model, 'rb'))
 
-    # get the indexes of the names in our dictionary
-    names_dict = set(open(p.names, 'rt').readlines())
+    # get the indexes of eval words
+    eval_words = set(open(p.eval, 'rt').readlines())
 
     outstr = ''
     avg = []
-    for word in names_dict:
+    for word in eval_words:
         w2v = vec(word.strip(), emb)
 
         if w2v is None:

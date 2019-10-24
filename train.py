@@ -15,8 +15,8 @@ def get_arguments():
     parser = argparse.ArgumentParser(
         description='Use this script to train different types of word embeddings.')
     parser.add_argument('-w', '--weights', help='The logistic regression weights.', required=False)
-    parser.add_argument('-uc', '--is_cuda', help='Check if it should use the GPUs', required=True)
-    parser.add_argument('-i', '--input', help='The input path to the training data.', required=True)
+    parser.add_argument('-uc', '--is_cuda', help='Check if it should use the GPUs', required=False, default=False, type=bool)
+    parser.add_argument('-i', '--input', help='The path to the input text file that the embeddings will be trained on.', required=True)
     parser.add_argument('-o', '--out_dir', help='The output directory where we store the results', required=True)
     parser.add_argument('-n', '--names', help='The list of names for which we want to debias the embeddings',
                         required=False)
@@ -40,9 +40,11 @@ if __name__ == '__main__':
     p = get_arguments()
 
     if p.model == 'w2v':
+        print("Using w2v skip-gram approach.")
         model = Word2Vec(data_path=p.input, vocab_size=p.vocab_size, emb_size=p.emb_dim, output_dir=p.out_dir,
                          is_cuda=p.is_cuda, emb_model_states=p.emb_states)
-    elif p.model == 'debiasw2v':
+    elif p.model == 'debiasEmb':
+        print("Using debiasEmb")
         lr_weights = np.array(open(p.weights, 'rt').read().strip().split('\t'))
         intercept = float(re.sub(r'\[|\]', '', lr_weights[0]))
         lr_weights = lr_weights[1:].astype(np.float)
@@ -51,8 +53,8 @@ if __name__ == '__main__':
         check_names = p.check_names == 'True'
         names_dict = set([line.strip().lower() for line in open(p.names, 'rt').readlines()])
 
-        print ('Dictionary names length %d' % len(names_dict))
-        print (lr_weights.shape)
+        print('Dictionary names length %d' % len(names_dict))
+        print(lr_weights.shape)
         model = DebiasWord2Vec(data_path=p.input, vocab_size=p.vocab_size, emb_size=p.emb_dim, output_dir=p.out_dir,
                                is_cuda=p.is_cuda, sent_lr_weights=lr_weights, check_names=check_names,
                                intercept=intercept, names_dict=names_dict, emb_model_states=p.emb_states)

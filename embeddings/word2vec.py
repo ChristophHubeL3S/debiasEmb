@@ -43,7 +43,7 @@ class Word2Vec:
             pipeline.sentence_pointer = 0
             start_time = time.time()
 
-            print ('Started training for epoch %d' % step)
+            print('Started training for epoch %d' % step)
 
             # iterate over all the batches in the data
             avg_loss = 0

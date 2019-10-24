@@ -3,7 +3,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-
 class SkipGram(nn.Module):
     def __init__(self, vocab_size, emb_dimension, is_cuda=True):
         super(SkipGram, self).__init__()

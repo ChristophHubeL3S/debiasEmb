@@ -284,6 +284,11 @@ class DataPipeline:
         :param target_inputs: []
         :return:
         """
+
+        # testing
+        print("Batch_size: ", batch_size)
+        print("Number of negative samples: ", num)
+
         neg = np.zeros((num))
         for i in range(batch_size):
             delta = random.sample(self.unigram_table, num)
