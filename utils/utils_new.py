@@ -273,7 +273,6 @@ class DataPipeline:
                 # in_dict_label = sentence[cx_idx] in names_dict
                 names.append(1 if in_dict_center else 0)
 
-
         return center, labels, names
 
     def get_neg_data(self, batch_size, num, target_inputs, context_inputs):
@@ -288,6 +287,7 @@ class DataPipeline:
         # testing
         print("Batch_size: ", batch_size)
         print("Number of negative samples: ", num)
+        print(target_inputs)
 
         neg = np.zeros((num))
         for i in range(batch_size):
@@ -296,3 +296,15 @@ class DataPipeline:
                 delta = random.sample(self.unigram_table, num)
             neg = np.vstack([neg, delta])
         return neg[1: batch_size + 1]
+
+        # print(self.unigram_table)
+        #
+        # neg = np.zeros((num))
+        # for i in range(batch_size):
+        #     delta = random.sample(self.unigram_table, num)
+        #     while target_inputs[i] in delta:
+        #         # print("delta: ", delta)
+        #         # print("target input: ", target_inputs[i])
+        #         delta = random.sample(self.unigram_table, num)
+        #     neg = np.vstack([neg, delta])
+        # return neg[1: batch_size + 1]
